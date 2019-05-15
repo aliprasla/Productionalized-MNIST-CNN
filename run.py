@@ -24,16 +24,6 @@ APP = Flask(__name__)
 logging.basicConfig(level=LOGLEVEL)
 
 
-
-
-@APP.route("/", methods=["GET"])
-def index():
-    """
-    Home for web app. Calls index
-    """
-    return render_template('index.html')
-
-
 @APP.route("/train", methods=["POST"])
 def train_model():
     # re-run model training endpoint here
@@ -65,12 +55,6 @@ def train_model():
         return message
 
     return "Successful"
-
-
-@APP.route("/scripts/train.js", methods=['GET'])
-def scripts_train_js():
-    with open('templates/scripts/train.js', 'r') as file:
-        return file.read().replace('\n', '')
 
 
 if __name__ == "__main__":
