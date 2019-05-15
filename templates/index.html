@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MNIST Application</title>
+<style>
+	body {
+	  background-color: lightgrey;
+	  text-align: center;
+	  color: black;
+	}
+</style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="scripts/train.js"></script>
+<script>
+	$(document).ready(function () {
+		var model_training_text = $("#model_training_text")
+		//complete
+  		$("#train_model_button").click(function(){
+			model_training_text = train_model_function(model_training_text)
+  		});
+	});
+
+</script>
+</head>
+<body>
+	<h1>MNIST Prediction Application</h1>
+	<button type="button" id="train_model_button"> Train Model</button>
+	<h3 id="model_training_text"></h3>
+</body>
+</html>

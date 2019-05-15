@@ -1,0 +1,8 @@
+.env
+.vscode
+
+# virtual environment
+env/
+
+# temporary data directory
+data/
