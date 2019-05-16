@@ -2,7 +2,6 @@ import logging
 import os
 
 from flask_restful import Resource
-from flask import request
 
 from app.models.cnn import MNISTClassifer
 import app.database as db
@@ -23,9 +22,6 @@ class TrainResource(Resource):
         Post request for /train. Used to re-train model
         
         """
-        #Will be used later
-        request_data = request
-
         # re-run model training endpoint here
 
         # load training data
