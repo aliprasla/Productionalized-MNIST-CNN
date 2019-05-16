@@ -1,8 +1,10 @@
 .env
 .vscode
 
-# caching
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
+
 
 # virtual environment
 env/
