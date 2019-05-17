@@ -16,6 +16,8 @@ class TrainResource(Resource):
     """
     Training Endpoint for Flask API 
     """
+    training_data_name_file_name = "mnist_training.pkl"
+    model_file_name = "mnist_model.pkl"
 
     def post(self):
         """
@@ -28,7 +30,7 @@ class TrainResource(Resource):
         LOGGER.info("Retraining Model")
 
         try:
-            training_data = db.load_training_data("mnist_training.pkl")
+            training_data = db.load_training_data(self.training_data_name_file_name)
 
             x_train = training_data['X']
             y_train = training_data['y']
@@ -44,7 +46,7 @@ class TrainResource(Resource):
                       verbose=2,
                       validation_split=0.2)
 
-            db.save_model(model, "mnist_model.pkl")
+            db.save_model(model,self.model_file_name)
 
         except Exception as exception:
             return str(exception),500
