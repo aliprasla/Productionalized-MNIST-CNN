@@ -4,6 +4,8 @@ This file contains Convolutional Neural Network based classes for MNIST
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Reshape, Flatten
 from keras.models import Model
 from keras.utils import to_categorical
+
+import keras
 import numpy as np
 import os
 
@@ -54,6 +56,7 @@ class MNISTClassifer:
         self.metrics = metrics
 
         self.model = None
+        self.training_history = None
 
     def fit(self, x_train, y_train, batch_size: int, **kwargs):
         """
@@ -65,6 +68,9 @@ class MNISTClassifer:
                 batch_size (int) :  number of sample per gradient update
 
                 **kwargs : additional parameters passed to the keras .fit method
+
+        Returns:
+            Final Validation Accuracy for the model
 
         """
 
@@ -79,9 +85,48 @@ class MNISTClassifer:
         self.model.compile(optimizer=self.optimizer,
                            loss=self.loss, metrics=self.metrics)
 
-        self.model.fit(x=x_train, y=y_one_hot,
+        history = self.model.fit(x=x_train, y=y_one_hot,
                        batch_size=batch_size,
                        **kwargs)
+
+        return history.history['val_acc']
+
+    def to_json(self):
+        """
+        Returns a json_dictionary of this object. 
+        """
+
+        # get model config and weights
+        
+
+        # get other parameters
+        out_dict = self.__dict__
+        out_dict['model_config'] = self.model.get_config()
+
+        out_dict['model_weights'] = [layer_weight.tolist() for layer_weight in self.model.get_weights()]
+
+        return out_dict
+
+    @classmethod
+    def from_json(self,model_json:dict):
+
+        model_config = model_json['model_config']
+        model_weights = model_json['model_weights']
+        
+        new_obj = MNISTClassifer()
+
+        for key,value in model_json.items():
+            if key not in ['model_config','model_weights']:
+                setattr(new_obj,key,value)
+
+
+        # set model
+        self.model = Model.from_config(model_config)
+        self.model.set_weights(model_weights)
+        
+        return new_obj
+
+        
 
     def predict(self, x_predict):
         """
@@ -90,9 +135,10 @@ class MNISTClassifer:
         Args:
                 x_predict (Array like) : Data upon which you want to make predictions
         """
-        print(x_predict.shape)
         # run prediction
         y_pred = self.model.predict(x_predict)
+
+        keras.backend.clear_session()
 
         # convert softmax floats into
         construct = np.argmax(y_pred, axis=1)
