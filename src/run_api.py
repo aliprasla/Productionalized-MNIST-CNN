@@ -8,6 +8,7 @@ from flask import Flask
 from flask_restful import Api
 
 from api.resources.resources_train import TrainResource
+from api.resources.resources_predict import PredictResource
 
 
 
@@ -24,6 +25,7 @@ API = Api(APP)
 logging.basicConfig(level=LOGLEVEL)
 
 API.add_resource(TrainResource, '/train')
+API.add_resource(PredictResource,'/predict')
 
 
 if __name__ == "__main__":

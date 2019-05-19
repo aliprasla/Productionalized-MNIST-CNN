@@ -5,7 +5,7 @@ from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Reshape, Flatten
 from keras.models import Model
 from keras.utils import to_categorical
 import numpy as np
-
+import os
 
 class MNISTClassifer:
     """
@@ -19,8 +19,8 @@ class MNISTClassifer:
     """
 
     # in this example we are using the basic MNIST Dimensions
-    feature_length = 784
-    num_classes = 10
+    feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
+    num_classes = int(os.environ['MNIST_NUMBER_OF_CLASSES'])
 
     def __init__(self,
                  conv_layer_one_filters=20,
@@ -90,7 +90,7 @@ class MNISTClassifer:
         Args:
                 x_predict (Array like) : Data upon which you want to make predictions
         """
-
+        print(x_predict.shape)
         # run prediction
         y_pred = self.model.predict(x_predict)
 
