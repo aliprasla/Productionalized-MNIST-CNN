@@ -50,6 +50,6 @@ class TrainResource(Resource):
             db.save_model(model, self.model_file_name)
 
         except Exception as exception:
-            return str(exception), 500
+            return {"message":str(exception)}, 500
 
-        return "Successful", 200
+        return {"message":"Successful"}, 200
