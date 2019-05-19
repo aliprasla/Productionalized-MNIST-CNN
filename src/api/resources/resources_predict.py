@@ -52,20 +52,23 @@ class PredictResource(Resource):
         x_pred = np.array(feature_array).flatten().reshape(1, -1)
 
         # once this is complete, return data
+        try:
+            # TODO: Add more testing for this
+            LOGGER.info("Attempting to Load Model")
 
-        # TODO: Add more testing for this
-        LOGGER.info("Attempting to Load Model")
+            model = db.load_model("mnist_model.pkl")
 
-        model = db.load_model("mnist_model.pkl")
+            LOGGER.info("Model Loaded Successfully.")
 
-        LOGGER.info("Model Loaded Successfully.")
-
-        LOGGER.info("Beginning Prediction")
-        prediction = model.predict(x_pred)
-        LOGGER.info("Finished Prediction")
+            LOGGER.info("Beginning Prediction")
+            prediction = model.predict(x_pred)
+            LOGGER.info("Finished Prediction")
+            assert prediction.shape[0] == 1, "Too much data in request"
+        except Exception as e:
+            LOGGER.info("Model prediction failed.")
+            keras.backend.clear_session()
+            return {"message":"Model prediction failed. Error: {}".format(str(e))},500
 
         keras.backend.clear_session()
-
-        assert prediction.shape[0] == 1
 
         return {'class': prediction[0]}, 200
