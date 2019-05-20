@@ -19,7 +19,7 @@ class TrainResource(Resource):
     Training Endpoint for Flask API 
     """
     training_data_name_file_name = "mnist_training.pkl"
-    model_file_name = "mnist_model.pkl"
+    model_file_name = "mnist_model.json"
 
     def post(self):
         """
@@ -60,5 +60,9 @@ class TrainResource(Resource):
             keras.backend.clear_session()
             LOGGER.info('Training Failed. Traceback:\n {}'.format(traceback.format_exc()))
             return {"message":str(exception)}, 500
-
-        return {"message":"Training_Successful","validation_accuracy":validation_accuracy}, 200
+        
+        keras.backend.clear_session()
+        return {"message":"Training_Successful",
+                "metrics":{
+                    "validation_accuracy":validation_accuracy
+                }, 200

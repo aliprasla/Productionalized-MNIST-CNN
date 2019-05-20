@@ -24,8 +24,8 @@ class GoogleCloudStorage:
         Loads environment variables into object
         """
         self.bucket_name = os.environ.get('GCP_BUCKET_NAME')
-
-    def load_pickle_file(self,f_path):
+ 
+    def load_file_as_string(self,f_path):
         """
         Loads a pickle file located at the f_path
         
@@ -33,7 +33,7 @@ class GoogleCloudStorage:
             f_path (Pathlib) : file location of data on the GCP bucket
 
         Returns:
-            Unpickled Object stored at that location
+            File downloaded stored at that location
         """
         # get gcp bucket
         bucket = self._get_bucket()
@@ -42,18 +42,16 @@ class GoogleCloudStorage:
 
         blob = bucket.blob(str(f_path))
 
-        string_serializations = blob.download_as_string()
-
-        return pickle.loads(string_serializations)
+        return blob.download_as_string()
 
 
-    def save_pickle_file(self,obj:object,f_path):
+    def save_file_as_string(self,obj_as_string:str,f_path):
         """
         Saves a pickled version of obj at f_path
 
         Args:
 
-            obj (Object) : what object you want to save on the cloud bucket
+            obj_as_string (str) : what object you want to save on the cloud bucket. Already serialized.
             f_path (Pathlib) : where do you want to save the file
 
         Returns:
@@ -62,19 +60,11 @@ class GoogleCloudStorage:
         # get bucket where you want to upload the object
         bucket = self._get_bucket()
 
-        # the object into a serialized format
-        serialized_object = pickle.dumps(obj=obj)
-
         # get blob location upon which to upload the object
         blob = bucket.blob(str(f_path))
 
         # upload the file
-        blob.upload_from_string(data=serialized_object)
-
-
-
-
-
+        blob.upload_from_string(data=obj_as_string)
 
     def _get_bucket(self):
         """

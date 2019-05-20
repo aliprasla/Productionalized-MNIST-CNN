@@ -5,10 +5,13 @@ import logging
 import os
 import json
 import keras
+import tensorflow as tf
 import traceback
 
 from flask import request
 from flask_restful import Resource
+
+from app.models.cnn import MNISTClassifer
 
 import numpy as np
 import app.database as db
@@ -25,7 +28,7 @@ class PredictResource(Resource):
     Prediction Endpoint for Flask API 
     """
     feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
-    model_file_name = "mnist_model.pkl"
+    model_file_name = "mnist_model.json"
     pixel_values_key = 'pixel_values'
     def post(self):
         """
@@ -58,13 +61,20 @@ class PredictResource(Resource):
             # TODO: Add more testing for this
             LOGGER.info("Attempting to Load Model")
 
-            model = db.load_model(self.model_file_name)
+            model_config = db.load_model(self.model_file_name)
+            
+            with tf.Graph().as_default():
+                
+                model = MNISTClassifer.from_json(model_config)
+                
+                LOGGER.info("Model Loaded Successfully.")
+                
+                LOGGER.info("Beginning Prediction")
+                
+                prediction = model.predict(x_pred)
 
-            LOGGER.info("Model Loaded Successfully.")
+            keras.backend.clear_session()
 
-            LOGGER.info("Beginning Prediction")
-
-            prediction = model.predict(x_pred)
 
             LOGGER.info("Finished Prediction")
             

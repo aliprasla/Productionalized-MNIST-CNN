@@ -1,11 +1,16 @@
 """
-This file contains Convolutional Neural Network based classes for MNIST
+This file contains Convolutional Neural Network based classes for MNIST.
+
+For more information on why default graph declaration is important via TensorFlow, view this thread:
+https://github.com/tensorflow/tensorflow/issues/14356
+
 """
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Reshape, Flatten
 from keras.models import Model
 from keras.utils import to_categorical
 
 import keras
+import tensorflow as tf
 import numpy as np
 import os
 
@@ -83,13 +88,14 @@ class MNISTClassifer:
         self.model = self._get_untrained_model()
 
         self.model.compile(optimizer=self.optimizer,
-                           loss=self.loss, metrics=self.metrics)
+                        loss=self.loss, metrics=self.metrics)
 
         history = self.model.fit(x=x_train, y=y_one_hot,
-                       batch_size=batch_size,
-                       **kwargs)
+                    batch_size=batch_size,
+                    **kwargs)
+        
 
-        return history.history['val_acc']
+        return history.history['val_acc'][-1]
 
     def to_json(self):
         """
@@ -102,8 +108,11 @@ class MNISTClassifer:
         # get other parameters
         out_dict = self.__dict__
         out_dict['model_config'] = self.model.get_config()
-
+        
         out_dict['model_weights'] = [layer_weight.tolist() for layer_weight in self.model.get_weights()]
+
+        # get rid of model 
+        out_dict.pop('model')
 
         return out_dict
 
@@ -119,10 +128,10 @@ class MNISTClassifer:
             if key not in ['model_config','model_weights']:
                 setattr(new_obj,key,value)
 
-
+        
         # set model
-        self.model = Model.from_config(model_config)
-        self.model.set_weights(model_weights)
+        new_obj.model = Model.from_config(model_config)
+        new_obj.model.set_weights(model_weights)
         
         return new_obj
 
@@ -135,10 +144,9 @@ class MNISTClassifer:
         Args:
                 x_predict (Array like) : Data upon which you want to make predictions
         """
+
         # run prediction
         y_pred = self.model.predict(x_predict)
-
-        keras.backend.clear_session()
 
         # convert softmax floats into
         construct = np.argmax(y_pred, axis=1)
