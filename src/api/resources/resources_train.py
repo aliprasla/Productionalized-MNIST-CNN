@@ -1,5 +1,7 @@
 import logging
 import os
+import keras
+import traceback
 
 from flask_restful import Resource
 
@@ -17,7 +19,7 @@ class TrainResource(Resource):
     Training Endpoint for Flask API 
     """
     training_data_name_file_name = "mnist_training.pkl"
-    model_file_name = "mnist_model.pkl"
+    model_file_name = "mnist_model.json"
 
     def post(self):
         """
@@ -30,9 +32,12 @@ class TrainResource(Resource):
         LOGGER.info("Retraining Model")
 
         try:
+            LOGGER.info("Loading Training Data")
+
             training_data = db.load_training_data(
                 self.training_data_name_file_name)
 
+            LOGGER.info("Training Data Loaded Successfully")
             x_train = training_data['X']
             y_train = training_data['y']
 
@@ -41,15 +46,23 @@ class TrainResource(Resource):
 
             model = MNISTClassifer()
 
-            model.fit(x_train=x_train, y_train=y_train,
+            validation_accuracy = model.fit(x_train=x_train, y_train=y_train,
                       batch_size=200,
                       epochs=5,
                       verbose=2,
                       validation_split=0.2)
-
+            
             db.save_model(model, self.model_file_name)
+            
 
         except Exception as exception:
-            return {"message":str(exception)}, 500
 
-        return {"message":"Successful"}, 200
+            keras.backend.clear_session()
+            LOGGER.info('Training Failed. Traceback:\n {}'.format(traceback.format_exc()))
+            return {"message":str(exception)}, 500
+        
+        keras.backend.clear_session()
+        return {"message":"Training_Successful",
+                "metrics":{
+                    "validation_accuracy":validation_accuracy
+                }, 200

@@ -1,9 +1,16 @@
 """
-This file contains Convolutional Neural Network based classes for MNIST
+This file contains Convolutional Neural Network based classes for MNIST.
+
+For more information on why default graph declaration is important via TensorFlow, view this thread:
+https://github.com/tensorflow/tensorflow/issues/14356
+
 """
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Reshape, Flatten
 from keras.models import Model
 from keras.utils import to_categorical
+
+import keras
+import tensorflow as tf
 import numpy as np
 import os
 
@@ -54,6 +61,7 @@ class MNISTClassifer:
         self.metrics = metrics
 
         self.model = None
+        self.training_history = None
 
     def fit(self, x_train, y_train, batch_size: int, **kwargs):
         """
@@ -66,6 +74,9 @@ class MNISTClassifer:
 
                 **kwargs : additional parameters passed to the keras .fit method
 
+        Returns:
+            Final Validation Accuracy for the model
+
         """
 
         if y_train.ndim == 1:
@@ -77,11 +88,54 @@ class MNISTClassifer:
         self.model = self._get_untrained_model()
 
         self.model.compile(optimizer=self.optimizer,
-                           loss=self.loss, metrics=self.metrics)
+                        loss=self.loss, metrics=self.metrics)
 
-        self.model.fit(x=x_train, y=y_one_hot,
-                       batch_size=batch_size,
-                       **kwargs)
+        history = self.model.fit(x=x_train, y=y_one_hot,
+                    batch_size=batch_size,
+                    **kwargs)
+        
+
+        return history.history['val_acc'][-1]
+
+    def to_json(self):
+        """
+        Returns a json_dictionary of this object. 
+        """
+
+        # get model config and weights
+        
+
+        # get other parameters
+        out_dict = self.__dict__
+        out_dict['model_config'] = self.model.get_config()
+        
+        out_dict['model_weights'] = [layer_weight.tolist() for layer_weight in self.model.get_weights()]
+
+        # get rid of model 
+        out_dict.pop('model')
+
+        return out_dict
+
+    @classmethod
+    def from_json(self,model_json:dict):
+
+        model_config = model_json['model_config']
+        model_weights = model_json['model_weights']
+        
+        new_obj = MNISTClassifer()
+
+        for key,value in model_json.items():
+            if key not in ['model_config','model_weights']:
+                setattr(new_obj,key,value)
+
+        
+        # set model
+        new_obj.model = Model.from_config(model_config)
+        new_obj.model.set_weights(model_weights)
+        
+        return new_obj
+
+        
 
     def predict(self, x_predict):
         """
@@ -90,7 +144,7 @@ class MNISTClassifer:
         Args:
                 x_predict (Array like) : Data upon which you want to make predictions
         """
-        print(x_predict.shape)
+
         # run prediction
         y_pred = self.model.predict(x_predict)
 

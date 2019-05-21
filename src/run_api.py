@@ -18,14 +18,14 @@ PORT = int(os.environ.get('PORT'))
 DEBUG = os.environ.get('DEBUG_MODE') == "True"
 HOST = os.environ.get("HOST_IP")
 LOGLEVEL = os.environ.get("LOGLEVEL").upper()
-
+API_VERSION = os.environ.get("API_VERSION")
 
 APP = Flask(__name__)
 API = Api(APP)
 logging.basicConfig(level=LOGLEVEL)
 
-API.add_resource(TrainResource, '/train')
-API.add_resource(PredictResource,'/predict')
+API.add_resource(TrainResource, '/{}/train'.format(API_VERSION))
+API.add_resource(PredictResource,'/{}/predict'.format(API_VERSION))
 
 
 if __name__ == "__main__":

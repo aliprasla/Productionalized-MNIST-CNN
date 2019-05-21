@@ -5,9 +5,13 @@ import logging
 import os
 import json
 import keras
+import tensorflow as tf
+import traceback
 
 from flask import request
 from flask_restful import Resource
+
+from app.models.cnn import MNISTClassifer
 
 import numpy as np
 import app.database as db
@@ -24,7 +28,8 @@ class PredictResource(Resource):
     Prediction Endpoint for Flask API 
     """
     feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
-
+    model_file_name = "mnist_model.json"
+    pixel_values_key = 'pixel_values'
     def post(self):
         """
         Returns Predictions upon the trained MNIST classifier
@@ -47,7 +52,7 @@ class PredictResource(Resource):
         # TODO: add basic input validation
 
         # process into array
-        feature_array = request_data.get('pixel_values')
+        feature_array = request_data.get(self.pixel_values_key)
 
         x_pred = np.array(feature_array).flatten().reshape(1, -1)
 
@@ -56,19 +61,31 @@ class PredictResource(Resource):
             # TODO: Add more testing for this
             LOGGER.info("Attempting to Load Model")
 
-            model = db.load_model("mnist_model.pkl")
+            model_config = db.load_model(self.model_file_name)
+            
+            with tf.Graph().as_default():
+                
+                model = MNISTClassifer.from_json(model_config)
+                
+                LOGGER.info("Model Loaded Successfully.")
+                
+                LOGGER.info("Beginning Prediction")
+                
+                prediction = model.predict(x_pred)
 
-            LOGGER.info("Model Loaded Successfully.")
+            keras.backend.clear_session()
 
-            LOGGER.info("Beginning Prediction")
-            prediction = model.predict(x_pred)
+
             LOGGER.info("Finished Prediction")
+            
             assert prediction.shape[0] == 1, "Too much data in request"
+        
         except Exception as e:
-            LOGGER.info("Model prediction failed.")
+        
+            LOGGER.info("Model prediction failed. Traceback: {}".format(traceback.format_exc()))
             keras.backend.clear_session()
             return {"message":"Model prediction failed. Error: {}".format(str(e))},500
 
-        keras.backend.clear_session()
+        
 
         return {'class': prediction[0]}, 200

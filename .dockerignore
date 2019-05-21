@@ -1,0 +1,5 @@
+# don't include model objects in image. Keep training data
+data/models/
+
+#virtualenv
+env/
