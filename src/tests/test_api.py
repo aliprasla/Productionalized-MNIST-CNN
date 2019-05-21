@@ -19,7 +19,7 @@ class APIEndpointTesting(unittest.TestCase):
     feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
     max_seconds_allowed_for_prediction = float(
         os.environ['MAX_SECONDS_ALLOWED_FOR_PREDICTION'])
-
+    api_version = os.environ['API_VERSION']
     def setUp(self):
         """
         Run API Locally
@@ -35,7 +35,7 @@ class APIEndpointTesting(unittest.TestCase):
         """
         Tests model training endpoint
         """
-        result = self.app.post('/train')
+        result = self.app.post('/{}/train'.format(self.api_version))
         assert result.status_code == 200, "Training failed. Server response: {}".format(
             result)
 
@@ -56,7 +56,7 @@ class APIEndpointTesting(unittest.TestCase):
             "pixel_values": x_pred
         }
         beg = time.time()
-        result = self.app.post('/predict', json=request_data)
+        result = self.app.post('/{}/predict'.format(self.api_version), json=request_data)
         total_time_for_prediction = time.time() - beg
 
         assert result.status_code == 200, "Normal prediction endpoint failed"
