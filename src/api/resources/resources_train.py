@@ -62,7 +62,4 @@ class TrainResource(Resource):
             return {"message":str(exception)}, 500
         
         keras.backend.clear_session()
-        return {"message":"Training_Successful",
-                "metrics":{
-                    "validation_accuracy":validation_accuracy
-                }, 200
+        return {"message":"Training_Successful","metrics":{"validation_accuracy":validation_accuracy}}, 200
