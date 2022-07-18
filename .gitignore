@@ -9,5 +9,3 @@ __pycache__/
 # virtual environment
 env/
 
-# temporary data directory
-data/

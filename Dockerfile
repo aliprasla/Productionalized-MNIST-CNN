@@ -11,6 +11,10 @@ EXPOSE $PORT
 
 COPY . .
 
+RUN mkdir data/models/
+
+RUN python3 src/run_model_training.py
+
 ENTRYPOINT ["python3","src/run_api.py"]
 
 

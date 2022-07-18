@@ -1,7 +1,6 @@
 """
 This file contains the Flask Interface used to make API requests
 """
-from asyncio.log import logger
 import logging
 import os
 import requests
@@ -10,7 +9,7 @@ import requests
 from flask import Flask
 from flask_restful import Api
 
-from api.resources.resources_train import TrainResource
+
 from api.resources.resources_predict import PredictResource
 
 
@@ -27,7 +26,7 @@ APP = Flask(__name__)
 API = Api(APP)
 logging.basicConfig(level=LOGLEVEL)
 
-API.add_resource(TrainResource, '/{}/train'.format(API_VERSION))
+
 API.add_resource(PredictResource,'/{}/predict'.format(API_VERSION))
 
 
