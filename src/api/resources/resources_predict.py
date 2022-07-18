@@ -27,7 +27,6 @@ class PredictResource(Resource):
     """
     Prediction Endpoint for Flask API 
     """
-    feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
     model_file_name = "mnist_model.json"
     pixel_values_key = 'prediction_data'
     def post(self):

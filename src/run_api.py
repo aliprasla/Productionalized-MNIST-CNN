@@ -1,8 +1,11 @@
 """
 This file contains the Flask Interface used to make API requests
 """
+from asyncio.log import logger
 import logging
 import os
+import requests
+
 
 from flask import Flask
 from flask_restful import Api
@@ -29,4 +32,11 @@ API.add_resource(PredictResource,'/{}/predict'.format(API_VERSION))
 
 
 if __name__ == "__main__":
+    LOGGER.info("HOST IP: {}".format(HOST))
+    LOGGER.info("API_VERSION: {}".format(API_VERSION))
+    LOGGER.info("PORT: {}".format(PORT))
+
+    
     APP.run(port=PORT, host=HOST, debug=DEBUG)
+    # train model
+    requests.post("localhost:{}/{}/train".format(PORT,API_VERSION))

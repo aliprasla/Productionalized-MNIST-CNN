@@ -1,0 +1,6 @@
+Required Environment Variables:
+
+LOGLEVEL - "info"
+PORT = 80
+API_VERSION = "v1"
+DATA_LOCATION = "local"

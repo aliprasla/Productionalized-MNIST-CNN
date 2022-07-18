@@ -1,4 +1,4 @@
-FROM python:3.11-rc-slim
+FROM python:3.10-slim
 
 WORKDIR /usr/local/src
 
@@ -12,3 +12,5 @@ EXPOSE $PORT
 COPY . .
 
 ENTRYPOINT ["python3","src/run_api.py"]
+
+
