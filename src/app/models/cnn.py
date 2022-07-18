@@ -139,12 +139,9 @@ class MNISTClassifer:
         # set model
         new_obj.model = Model.from_config(model_config)
 
-        import code
-        code.interact(local=locals())
-
         # convert weights nested list to numpy array
         model_weights = [np.array(x) for x in model_weights]
-        
+
         new_obj.model.set_weights(model_weights)
         
         return new_obj
