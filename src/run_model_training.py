@@ -29,6 +29,9 @@ if __name__ == "__main__":
 
         model = MNISTClassifer()
 
+        # process data to have x_train be binary
+
+
         validation_accuracy = model.fit(x_train=x_train,
                                         y_train=y_train,
                                         batch_size=200,

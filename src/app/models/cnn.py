@@ -96,7 +96,11 @@ class MNISTClassifer:
         self.model.compile(optimizer=self.optimizer,
                         loss=self.loss, metrics=self.metrics)
         
-        
+        # process data to have x_train be binary
+
+        x_train = x_train > 0
+
+
         history = self.model.fit(x=x_train, y=y_one_hot,
                     batch_size=batch_size,
                     **kwargs)
@@ -156,6 +160,9 @@ class MNISTClassifer:
                 x_predict (Array like) : Data upon which you want to make predictions
         """
 
+        # TODO: add validation testing
+        x_predict = x_predict > 0 
+        
         # run prediction
         y_pred = self.model.predict(x_predict)
 

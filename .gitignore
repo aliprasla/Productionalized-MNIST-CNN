@@ -9,3 +9,6 @@ __pycache__/
 # virtual environment
 env/
 
+# ignore model file
+data/models/mnist_model.json
+
