@@ -15,11 +15,12 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.info("Retraining Model")
 
 MODEL_FILE_NAME = "mnist_model.json"
-np.random.seed(10)
 
 if __name__ == "__main__": 
 
     try:      
+        np.random.seed(10)
+
         LOGGER.info("Loading Training Data")
 
         x_train, y_train = db.load_training_data()
