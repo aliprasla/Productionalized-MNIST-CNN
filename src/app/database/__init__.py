@@ -6,11 +6,14 @@ Implements an abstraction layer to minimize vendor lock.
 """
 
 import os
+import numpy as np
 import pickle
 import json
 
+
 from pathlib import Path
 
+from tensorflow.keras.datasets import mnist
 from app.database.google_cloud_storage import GoogleCloudStorage
 
 # load environment variables
@@ -19,15 +22,15 @@ DATA_LOCATION = os.environ.get('DATA_LOCATION')
 GCP_DATA_LOCATION_NAME = "gcp"
 LOCAL_DATA_LOCATION_NAME = "local"
 
-def load_training_data(data_name):
+def load_training_data():
     """
-    Loads training data from directory
+    Loads training data from mnist file
     """
-    f_path = _get_training_data_directory()/data_name
-    
-    #load training data locally
-    return _load_pickle_file(f_path,data_location_var=LOCAL_DATA_LOCATION_NAME)
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
+    x_train = np.append(x_train,x_test,axis=0)
+    y_train = np.append(y_train, y_test,axis=0)
+    return x_train,y_train
 
 def save_model(model_object, model_name: str):
     """
@@ -130,7 +133,9 @@ def _save_json_file(obj_as_json, f_path,data_location_var=DATA_LOCATION):
     
     if data_location_var == LOCAL_DATA_LOCATION_NAME:
         # local data
-        pickle.dump(obj_as_json, open(f_path, 'wb'))
+        import code
+        code.interact(local=locals())
+        json.dump(obj_as_json, open(f_path, 'w'))
 
 
     elif data_location_var == GCP_DATA_LOCATION_NAME:

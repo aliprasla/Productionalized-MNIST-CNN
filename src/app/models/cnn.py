@@ -5,6 +5,7 @@ For more information on why default graph declaration is important via TensorFlo
 https://github.com/tensorflow/tensorflow/issues/14356
 
 """
+from decimal import localcontext
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Reshape, Flatten
 from keras.models import Model
 from keras.utils import to_categorical
@@ -26,8 +27,12 @@ class MNISTClassifer:
     """
 
     # in this example we are using the basic MNIST Dimensions
-    feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
-    num_classes = int(os.environ['MNIST_NUMBER_OF_CLASSES'])
+    
+
+    # MNIST has fixed dimensions
+    num_classes = 9
+    num_pixel_rows_per_image = 28
+    num_pixel_columns_per_image = 28
 
     def __init__(self,
                  conv_layer_one_filters=20,
@@ -80,22 +85,24 @@ class MNISTClassifer:
         """
 
         if y_train.ndim == 1:
-            y_one_hot = to_categorical(y_train, num_classes=self.num_classes)
+            y_one_hot = to_categorical(y_train, num_classes=self.num_classes + 1)
         else:
             assert y_one_hot.shape[1] == self.num_classes
             y_one_hot = y_train
+
 
         self.model = self._get_untrained_model()
 
         self.model.compile(optimizer=self.optimizer,
                         loss=self.loss, metrics=self.metrics)
-
+        
+        
         history = self.model.fit(x=x_train, y=y_one_hot,
                     batch_size=batch_size,
                     **kwargs)
         
 
-        return history.history['val_acc'][-1]
+        return history.history['val_accuracy'][-1]
 
     def to_json(self):
         """
@@ -106,13 +113,13 @@ class MNISTClassifer:
         
 
         # get other parameters
-        out_dict = self.__dict__
+        out_dict = {}
+
         out_dict['model_config'] = self.model.get_config()
         
         out_dict['model_weights'] = [layer_weight.tolist() for layer_weight in self.model.get_weights()]
 
-        # get rid of model 
-        out_dict.pop('model')
+
 
         return out_dict
 
@@ -131,6 +138,13 @@ class MNISTClassifer:
         
         # set model
         new_obj.model = Model.from_config(model_config)
+
+        import code
+        code.interact(local=locals())
+
+        # convert weights nested list to numpy array
+        model_weights = [np.array(x) for x in model_weights]
+        
         new_obj.model.set_weights(model_weights)
         
         return new_obj
@@ -162,11 +176,10 @@ class MNISTClassifer:
         # input layer with dimensions
 
         # assuming square images for MNIST
-        num_image_rows = int(np.sqrt(self.feature_length))
+       
+        input_layer = Input(shape=(self.num_pixel_rows_per_image, self.num_pixel_columns_per_image,))
 
-        input_layer = Input(shape=(self.feature_length,))
-
-        model = Reshape((num_image_rows, num_image_rows, 1))(input_layer)
+        model = Reshape((self.num_pixel_rows_per_image, self.num_pixel_columns_per_image,1))(input_layer)
 
         # define convolutional layers
 
@@ -186,6 +199,7 @@ class MNISTClassifer:
                       activation=self.dense_layer_two_activation)(model)
 
         prediction_layer = Dense(
-            units=self.num_classes, activation="softmax", name="output_layer")(model)
+            # add one for one hot encoding purposes
+            units=self.num_classes + 1, activation="softmax", name="output_layer")(model)
 
         return Model(inputs=input_layer, outputs=prediction_layer)

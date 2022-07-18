@@ -29,7 +29,7 @@ class PredictResource(Resource):
     """
     feature_length = int(os.environ['MNIST_FEATURE_LENGTH'])
     model_file_name = "mnist_model.json"
-    pixel_values_key = 'pixel_values'
+    pixel_values_key = 'prediction_data'
     def post(self):
         """
         Returns Predictions upon the trained MNIST classifier
@@ -52,9 +52,10 @@ class PredictResource(Resource):
         # TODO: add basic input validation
 
         # process into array
-        feature_array = request_data.get(self.pixel_values_key)
-
-        x_pred = np.array(feature_array).flatten().reshape(1, -1)
+        feature_array = json.loads(request_data.get(self.pixel_values_key))
+        # find number of records to predict
+        x_pred = np.array(feature_array)
+      
 
         # once this is complete, return data
         try:
@@ -70,7 +71,8 @@ class PredictResource(Resource):
                 LOGGER.info("Model Loaded Successfully.")
                 
                 LOGGER.info("Beginning Prediction")
-                
+
+
                 prediction = model.predict(x_pred)
 
             keras.backend.clear_session()

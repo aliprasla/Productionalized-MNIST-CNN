@@ -2,6 +2,7 @@ import logging
 import os
 import keras
 import traceback
+from tensorflow.keras.datasets import mnist
 
 from flask_restful import Resource
 
@@ -18,7 +19,6 @@ class TrainResource(Resource):
     """
     Training Endpoint for Flask API 
     """
-    training_data_name_file_name = "mnist_training.pkl"
     model_file_name = "mnist_model.json"
 
     def post(self):
@@ -34,15 +34,9 @@ class TrainResource(Resource):
         try:
             LOGGER.info("Loading Training Data")
 
-            training_data = db.load_training_data(
-                self.training_data_name_file_name)
+            x_train, y_train = db.load_training_data()
 
             LOGGER.info("Training Data Loaded Successfully")
-            x_train = training_data['X']
-            y_train = training_data['y']
-
-            # free up memory space
-            training_data = None
 
             model = MNISTClassifer()
 
