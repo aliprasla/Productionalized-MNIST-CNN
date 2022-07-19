@@ -386,7 +386,7 @@
 
 
             //make post request to server
-            url = "http://localhost:8080/v1/predict"
+            url = "http://mnist-balancer-2-580285985.us-east-1.elb.amazonaws.com/predict"
             /* Data which will be sent to server */
 
             request_body = JSON.stringify({
@@ -408,13 +408,24 @@
                     "content-type": "text/plain"
 
                 }
-                 
             }).then((response) => {
 
                 if (response.status != 200){
                     console.log("Something went wrong here.");
                 }
                 return response.json();
+
+            }).catch((error) => {
+
+                alert("Prediction API error: " + error);
+                spinner.style.visibility = "hidden";
+                spinner.classList.remove('spin');
+                
+                // draw classify button
+                drawClassifyButton();
+
+                drawOn = true
+                draw();
 
             }).then((data) => {
                 // Save prediction
