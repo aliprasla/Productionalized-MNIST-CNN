@@ -1,6 +1,7 @@
 """
 This file contains the Flask Interface used to make API requests
 """
+from email import header
 import logging
 import os
 import requests
@@ -37,5 +38,3 @@ if __name__ == "__main__":
 
     
     APP.run(port=PORT, host=HOST, debug=DEBUG)
-    # train model
-    requests.post("localhost:{}/{}/train".format(PORT,API_VERSION))

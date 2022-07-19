@@ -45,8 +45,11 @@ class PredictResource(Resource):
             'class': (predicted_class_number)
         }
         """
-
+        LOGGER.info("Beginning Model Prediction")
+        
+        LOGGER.info(str(request.data))
         request_data = json.loads(request.data)
+
 
         # TODO: add basic input validation
 
@@ -89,4 +92,4 @@ class PredictResource(Resource):
 
         
 
-        return {'class': prediction[0]}, 200
+        return {'class': prediction[0]}, 200, {'Access-Control-Allow-Origin':'*'}
