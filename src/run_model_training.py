@@ -27,17 +27,20 @@ if __name__ == "__main__":
 
         LOGGER.info("Training Data Loaded Successfully")
 
-        model = MNISTClassifer()
+        model = MNISTClassifer(
+            conv_layer_one_filters=35,
+            conv_layer_one_kernel_size = (3,3),
+            dense_layer_one_num_units = 40)
 
         # process data to have x_train be binary
 
 
         validation_accuracy = model.fit(x_train=x_train,
                                         y_train=y_train,
-                                        batch_size=200,
-                                        epochs=5,
+                                        batch_size=300,
+                                        epochs=7,
                                         verbose=2,
-                                        validation_split=0.2)
+                                        validation_split=0.1)
 
         LOGGER.info("Model Training Successful. Validation Accuracy: {}".format(validation_accuracy))
         LOGGER.info("Attempting to save model to directory")

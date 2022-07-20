@@ -41,8 +41,6 @@ class MNISTClassifer:
                  max_pooling_layer_one_pool_size=(2, 2),
                  dense_layer_one_num_units=20,
                  dense_layer_one_activation='relu',
-                 dense_layer_two_num_units=20,
-                 dense_layer_two_activation='relu',
                  optimizer='adam',
                  loss='categorical_crossentropy',
                  metrics=['accuracy']):
@@ -58,8 +56,6 @@ class MNISTClassifer:
         self.dense_layer_one_num_units = dense_layer_one_num_units
         self.dense_layer_one_activation = dense_layer_one_activation
 
-        self.dense_layer_two_num_units = dense_layer_two_num_units
-        self.dense_layer_two_activation = dense_layer_two_activation
 
         self.optimizer = optimizer
         self.loss = loss
@@ -100,6 +96,8 @@ class MNISTClassifer:
 
         x_train = x_train > 0
 
+        import code
+        code.interact(local=locals())
 
         history = self.model.fit(x=x_train, y=y_one_hot,
                     batch_size=batch_size,
@@ -198,9 +196,6 @@ class MNISTClassifer:
 
         model = Dense(units=self.dense_layer_one_num_units,
                       activation=self.dense_layer_one_activation)(model)
-
-        model = Dense(units=self.dense_layer_two_num_units,
-                      activation=self.dense_layer_two_activation)(model)
 
         prediction_layer = Dense(
             # add one for one hot encoding purposes
